@@ -1,0 +1,14 @@
+node_modules/
+dist/
+# ignore logs
+logs
+*.log
+# Environment varibles
+*.env
+
+#temp
+temp
+.DS_Store
+
+*.save
+*.save.*

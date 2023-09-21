@@ -9,5 +9,6 @@
     "printWidth": 120,
     "jsxSingleQuote": true,
     "bracketSpacing": false,
-    "jsxBracketSameLine": false
+    "jsxBracketSameLine": false,
+    "proseWrap": "always"
 }

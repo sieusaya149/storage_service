@@ -1,5 +1,5 @@
 import {Response} from 'express';
-import Logger from '~/helpers/Logger';
+import Logger from '../helpers/Logger';
 // Helper code for the API consumer to understand the error and handle is accordingly
 enum ResponseCode {
     SUCCESS = '10000',
@@ -53,7 +53,9 @@ abstract class ApiResponse {
 
     public send(res: Response, headers: {[key: string]: string} = {}): Response {
         if (this.status != ResponseStatus.SUCCESS) {
-            Logger.warn(`Api Result will be failed with code ${this.code} and status ${this.status}`);
+            Logger.warn(
+                `Api Result will be failed with code ${this.code} status ${this.status} with messsage ${this.message}`
+            );
         }
         return this.prepare<ApiResponse>(res, this, headers);
     }

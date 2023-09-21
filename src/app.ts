@@ -4,11 +4,7 @@ import cors from 'cors';
 import {corsUrl, environment} from './config';
 import routers from './routers';
 import {NotFoundError, ApiError, InternalError, ErrorType} from './core/ApiError';
-// If the Node process terminated, prepare something before truely die
-process.on('SIGINT', () => {
-    Logger.info('Terminate Server');
-    process.exit(0);
-});
+import './database'; // initialize database
 
 process.on('uncaughtException', (e: Error) => {
     Logger.error(e);

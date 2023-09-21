@@ -13,7 +13,22 @@ if (!fs.existsSync(dir)) {
     // Create the directory if it does not exist
     fs.mkdirSync(dir);
 }
-const logLevel = environment === 'development' ? 'debug' : 'warn';
+const options = {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    fractionalSecondDigits: 3, // Include milliseconds
+    hour12: true // Use AM/PM format
+} as Intl.DateTimeFormatOptions;
+const timezoned = () => {
+    return new Date().toLocaleString('en-US', options);
+};
+
+const logLevel = environment === 'development' || environment === 'test' ? 'debug' : 'warn';
 const dailyRotateFile = new DailyRotateFile({
     level: logLevel,
     filename: dir + '/%DATE%.log',
@@ -22,7 +37,7 @@ const dailyRotateFile = new DailyRotateFile({
     handleExceptions: true,
     maxSize: '20m',
     maxFiles: '14d',
-    format: format.combine(format.errors({stack: true}), format.timestamp(), format.json())
+    format: format.combine(format.errors({stack: true}), format.timestamp({format: timezoned}), format.json())
 });
 
 // create logger from DailyRotateFile with format and log level then export it

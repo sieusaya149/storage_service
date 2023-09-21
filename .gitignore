@@ -12,3 +12,6 @@ temp
 
 *.save
 *.save.*
+
+#test
+coverage/

@@ -4,6 +4,7 @@ import cors from 'cors';
 import {corsUrl, environment} from './config';
 import routers from './routers';
 import {NotFoundError, ApiError, InternalError, ErrorType} from './core/ApiError';
+import cookieParser from 'cookie-parser';
 import './database'; // initialize database
 
 process.on('uncaughtException', (e: Error) => {
@@ -31,6 +32,8 @@ app.use(
         optionsSuccessStatus: 200
     })
 );
+
+app.use(cookieParser());
 
 // add router
 app.use('/', routers);

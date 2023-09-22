@@ -33,11 +33,13 @@ export class UserData implements User {
         Object.assign(this, data);
     }
     // Add a method to sanitize the user object (remove password) before returning it to the client
-    public sanitize(): User {
+    public sanitize(login: boolean = false): User {
+        if (!login) {
+            delete this.bio;
+            delete this.verified;
+        }
         // @ts-ignore
         delete this.password;
-        delete this.bio;
-        delete this.verified;
         return this;
     }
 }

@@ -38,6 +38,13 @@ class UserRepo {
             .exec();
     };
 
+    static findByUserName = async (userName: string): Promise<User | null> => {
+        return UserModel.findOne({userName: userName})
+            .select('+email +password +bio')
+            .lean() // it will return js object
+            .exec();
+    };
+
     static create = async (user: User): Promise<User> => {
         const now = new Date();
         user.createdAt = user.updatedAt = now;

@@ -11,7 +11,7 @@ export const createCookiesAuthen = (
     userId: string | undefined
 ) => {
     if (!userId) {
-        throw new Error('User Id is null');
+        throw new Error('UserId is null');
     }
     res.cookie('access-token', accessToken, {
         httpOnly: true,
@@ -33,4 +33,40 @@ export const createCookiesAuthen = (
         sameSite: 'strict',
         secure: secureCookies
     });
+};
+
+// TODO: Should have a way to sync between set and unset cookies
+export const createCookiesLogout = (res: Response) => {
+    res.cookie(
+        'access-token',
+        {},
+        {
+            httpOnly: true,
+            maxAge: 0,
+            sameSite: 'strict',
+            secure: secureCookies
+        }
+    );
+
+    res.cookie(
+        'refresh-token',
+        {},
+        {
+            httpOnly: true,
+            maxAge: 0,
+            sameSite: 'strict',
+            secure: secureCookies
+        }
+    );
+
+    res.cookie(
+        'userId',
+        {},
+        {
+            httpOnly: true,
+            maxAge: 0,
+            sameSite: 'strict',
+            secure: secureCookies
+        }
+    );
 };

@@ -30,12 +30,18 @@ abstract class ApiResponse {
         this.message = message;
     }
 
-    protected prepare<T extends ApiResponse>(res: Response, response: T, headers: {[key: string]: string}): Response {
+    protected prepare<T extends ApiResponse>(
+        res: Response,
+        response: T,
+        headers: {[key: string]: string}
+    ): Response {
         for (const [key, value] of Object.entries(headers)) {
             res.append(key, value);
         }
 
-        return res.status(this.status).json(this.sanitize<ApiResponse>(response));
+        return res
+            .status(this.status)
+            .json(this.sanitize<ApiResponse>(response));
     }
 
     private sanitize<T extends ApiResponse>(response: T): T {
@@ -51,7 +57,10 @@ abstract class ApiResponse {
         return clone;
     }
 
-    public send(res: Response, headers: {[key: string]: string} = {}): Response {
+    public send(
+        res: Response,
+        headers: {[key: string]: string} = {}
+    ): Response {
         if (this.status != ResponseStatus.SUCCESS) {
             Logger.warn(
                 `Api Result will be failed with code ${this.code} status ${this.status} with messsage ${this.message}`
@@ -123,7 +132,11 @@ export class SuccessResponse<T> extends ApiResponse {
 export class AccessTokenErrorResponse extends ApiResponse {
     private instruction = 'refresh_token';
     constructor(message = 'Access Token is Invalid') {
-        super(ResponseCode.INVALID_ACCESS_TOKEN, ResponseStatus.UNAUTHORIZED, message);
+        super(
+            ResponseCode.INVALID_ACCESS_TOKEN,
+            ResponseStatus.UNAUTHORIZED,
+            message
+        );
     }
 
     //override send function

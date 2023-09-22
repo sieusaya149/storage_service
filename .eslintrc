@@ -2,7 +2,12 @@
     "root": true,
     "parser": "@typescript-eslint/parser",
     "plugins": ["@typescript-eslint", "prettier"],
-    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "eslint-config-prettier", "prettier"],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "eslint-config-prettier",
+        "prettier"
+    ],
     "rules": {
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unused-vars": "off",
@@ -16,7 +21,7 @@
                 "endOfLine": "auto",
                 "useTabs": false,
                 "singleQuote": true,
-                "printWidth": 120,
+                "printWidth": 80,
                 "jsxSingleQuote": true,
                 "bracketSpacing": false,
                 "jsxBracketSameLine": false,

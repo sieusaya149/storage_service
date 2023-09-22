@@ -8,7 +8,6 @@ import User from '../database/model/User';
 import KeyStore from '../database/model/KeyStore';
 
 import bcrypt from 'bcrypt';
-import mongoConnection from '../database/index';
 import {
     AuthFailureError,
     InternalError,
@@ -21,9 +20,16 @@ import {
     NoDataError,
     AccessTokenError
 } from '../core/ApiError';
-import {generateKeyPair, generateTokenPair, payloadToken} from '../helpers/keygen';
+import {
+    generateKeyPair,
+    generateTokenPair,
+    payloadToken
+} from '../helpers/keygen';
 import Logger from '../helpers/Logger';
-import {createCookiesAuthen, createCookiesLogout} from '../cookies/createCookies';
+import {
+    createCookiesAuthen,
+    createCookiesLogout
+} from '../cookies/createCookies';
 
 export class AccessService {
     static signUp = async (req: Request, res: Response) => {
@@ -53,9 +59,16 @@ export class AccessService {
             } as User);
 
             // generate token pair
-            const payload: payloadToken = {userId: newUser._id, email: newUser.email};
+            const payload: payloadToken = {
+                userId: newUser._id,
+                email: newUser.email
+            };
 
-            const {accessToken, refreshToken} = generateTokenPair(payload, publicKey, privateKey);
+            const {accessToken, refreshToken} = generateTokenPair(
+                payload,
+                publicKey,
+                privateKey
+            );
             const newKeyStore = {
                 userId: newUser,
                 publicKey: publicKey,
@@ -66,14 +79,22 @@ export class AccessService {
             // create new keystore for user
             const newKey = await KeyStoreRepo.create(newKeyStore);
             // add cookies for response
-            createCookiesAuthen(res, accessToken, refreshToken, newUser._id?.toString());
+            createCookiesAuthen(
+                res,
+                accessToken,
+                refreshToken,
+                newUser._id?.toString()
+            );
 
             // await session.commitTransaction();
 
             // await session.endSession();
             Logger.info('New User and KeyStore Was Created Successfully');
 
-            return {userData: new UserData(newUser).sanitize(), keyStore: new KeyStoreData(newKey).sanitize()};
+            return {
+                userData: new UserData(newUser).sanitize(),
+                keyStore: new KeyStoreData(newKey).sanitize()
+            };
         } catch (error) {
             // await session.abortTransaction();
 
@@ -104,9 +125,16 @@ export class AccessService {
             // generate synmatrickeys pair
             const {privateKey, publicKey} = generateKeyPair();
             // payload in JWT
-            const payload: payloadToken = {userId: existingUser._id, email: existingUser.email};
+            const payload: payloadToken = {
+                userId: existingUser._id,
+                email: existingUser.email
+            };
 
-            const {accessToken, refreshToken} = generateTokenPair(payload, publicKey, privateKey);
+            const {accessToken, refreshToken} = generateTokenPair(
+                payload,
+                publicKey,
+                privateKey
+            );
             const newKeyStore = {
                 userId: existingUser,
                 publicKey: publicKey,
@@ -115,12 +143,22 @@ export class AccessService {
                 refreshToken: refreshToken
             } as KeyStore;
             // create new keystore for user
-            const newKey = (await KeyStoreRepo.upsertKeyForUser(newKeyStore)) as KeyStore; // should not null
+            const newKey = (await KeyStoreRepo.upsertKeyForUser(
+                newKeyStore
+            )) as KeyStore; // should not null
             // add cookies for response
-            createCookiesAuthen(res, accessToken, refreshToken, existingUser._id?.toString());
+            createCookiesAuthen(
+                res,
+                accessToken,
+                refreshToken,
+                existingUser._id?.toString()
+            );
             Logger.info('The KeyStore Was Updated Successfully');
 
-            return {userData: new UserData(existingUser).sanitize(true), keyStore: new KeyStoreData(newKey).sanitize()};
+            return {
+                userData: new UserData(existingUser).sanitize(true),
+                keyStore: new KeyStoreData(newKey).sanitize()
+            };
 
             // Replace the previous key
         } catch (error) {
@@ -134,7 +172,9 @@ export class AccessService {
 
     static logOut = async (req: Request, res: Response) => {
         if (req.keyStore) {
-            const data = await KeyStoreRepo.deleteKeyForUser(req.keyStore.userId);
+            const data = await KeyStoreRepo.deleteKeyForUser(
+                req.keyStore.userId
+            );
         }
         createCookiesLogout(res);
     };

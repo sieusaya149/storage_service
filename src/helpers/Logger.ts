@@ -28,7 +28,8 @@ const timezoned = () => {
     return new Date().toLocaleString('en-US', options);
 };
 
-const logLevel = environment === 'development' || environment === 'test' ? 'debug' : 'warn';
+const logLevel =
+    environment === 'development' || environment === 'test' ? 'debug' : 'warn';
 const dailyRotateFile = new DailyRotateFile({
     level: logLevel,
     filename: dir + '/%DATE%.log',
@@ -37,7 +38,11 @@ const dailyRotateFile = new DailyRotateFile({
     handleExceptions: true,
     maxSize: '20m',
     maxFiles: '14d',
-    format: format.combine(format.errors({stack: true}), format.timestamp({format: timezoned}), format.json())
+    format: format.combine(
+        format.errors({stack: true}),
+        format.timestamp({format: timezoned}),
+        format.json()
+    )
 });
 
 // create logger from DailyRotateFile with format and log level then export it
@@ -45,7 +50,10 @@ export default createLogger({
     transports: [
         new transports.Console({
             level: logLevel,
-            format: format.combine(format.errors({stack: true}), format.prettyPrint())
+            format: format.combine(
+                format.errors({stack: true}),
+                format.prettyPrint()
+            )
         }),
         dailyRotateFile
     ],

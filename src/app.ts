@@ -3,7 +3,12 @@ import Logger from './helpers/Logger';
 import cors from 'cors';
 import {corsUrl, environment} from './config';
 import routers from './routers';
-import {NotFoundError, ApiError, InternalError, ErrorType} from './core/ApiError';
+import {
+    NotFoundError,
+    ApiError,
+    InternalError,
+    ErrorType
+} from './core/ApiError';
 import cookieParser from 'cookie-parser';
 import './database'; // initialize database
 
@@ -48,9 +53,13 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof ApiError) {
         ApiError.handle(err, res);
         if (err.type === ErrorType.INTERNAL)
-            Logger.error(`500 - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+            Logger.error(
+                `500 - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`
+            );
     } else {
-        Logger.error(`500 - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+        Logger.error(
+            `500 - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`
+        );
         Logger.error(err);
         if (environment === 'development') {
             return res.status(500).send(err);

@@ -4,11 +4,15 @@ import KeyStore, {KeyStoreData, KeystoreModel} from '../model/KeyStore';
 import {ClientSession} from 'mongoose';
 import Logger from '~/helpers/Logger';
 class KeyStoreRepo {
-    static existingKeyForUser = async (user: User): Promise<KeyStore | null> => {
+    static existingKeyForUser = async (
+        user: User
+    ): Promise<KeyStore | null> => {
         return KeystoreModel.findOne({userId: user}).lean().exec();
     };
 
-    static getKeyForUser = async (userId: Types.ObjectId): Promise<KeyStore | null> => {
+    static getKeyForUser = async (
+        userId: Types.ObjectId
+    ): Promise<KeyStore | null> => {
         return KeystoreModel.findOne({userId: userId}).lean().exec();
     };
 
@@ -28,7 +32,9 @@ class KeyStoreRepo {
         return keyStore.toObject();
     };
 
-    static upsertKeyForUser = async (newKeyStore: KeyStore): Promise<KeyStore | null> => {
+    static upsertKeyForUser = async (
+        newKeyStore: KeyStore
+    ): Promise<KeyStore | null> => {
         const now = new Date();
         newKeyStore.updatedAt = now;
 
@@ -45,7 +51,13 @@ class KeyStoreRepo {
         const options = {upsert: true, new: true};
 
         // Use findOneAndUpdate to perform the upsert operation
-        const keyStore = await KeystoreModel.findOneAndUpdate(filter, update, options).lean().exec();
+        const keyStore = await KeystoreModel.findOneAndUpdate(
+            filter,
+            update,
+            options
+        )
+            .lean()
+            .exec();
 
         return keyStore;
     };

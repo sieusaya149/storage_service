@@ -95,4 +95,8 @@ const schemaKeyStore = new Schema<KeyStore>(
     }
 );
 
-export const KeystoreModel = model<KeyStore>(DOCUMENT_NAME, schemaKeyStore, COLLECTION_NAME);
+export const KeystoreModel = model<KeyStore>(
+    DOCUMENT_NAME,
+    schemaKeyStore,
+    COLLECTION_NAME
+);

@@ -10,7 +10,10 @@ export enum ValidationSource {
     COOKIES = 'cookies'
 }
 
-export default (schema: Joi.AnySchema, source: ValidationSource = ValidationSource.BODY) => {
+export default (
+    schema: Joi.AnySchema,
+    source: ValidationSource = ValidationSource.BODY
+) => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             const {error} = schema.validate(req[source]);
@@ -18,7 +21,9 @@ export default (schema: Joi.AnySchema, source: ValidationSource = ValidationSour
             if (!error) return next();
 
             const {details} = error;
-            const message = details.map((i) => i.message.replace(/['"]+/g, '')).join(',');
+            const message = details
+                .map((i) => i.message.replace(/['"]+/g, ''))
+                .join(',');
             Logger.error(message);
 
             next(new BadRequestError(message));

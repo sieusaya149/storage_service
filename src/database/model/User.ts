@@ -98,4 +98,8 @@ const schemaUser = new Schema<User>(
     }
 );
 
-export const UserModel = model<User>(DOCUMENT_NAME, schemaUser, COLLECTION_NAME);
+export const UserModel = model<User>(
+    DOCUMENT_NAME,
+    schemaUser,
+    COLLECTION_NAME
+);

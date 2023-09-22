@@ -106,6 +106,8 @@ describe('Sign Up New User', () => {
             password: 'abcd'
         });
         expect(response.status).toBe(400);
-        expect(response.body.message).toBe('UserName or Email already Registered');
+        expect(response.body.message).toBe(
+            'UserName or Email already Registered'
+        );
     });
 });

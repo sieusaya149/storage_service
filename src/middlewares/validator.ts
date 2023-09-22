@@ -6,7 +6,8 @@ export enum ValidationSource {
     BODY = 'body',
     HEADER = 'headers',
     QUERY = 'query',
-    PARAM = 'params'
+    PARAM = 'params',
+    COOKIES = 'cookies'
 }
 
 export default (schema: Joi.AnySchema, source: ValidationSource = ValidationSource.BODY) => {

@@ -14,5 +14,11 @@ export default {
             email: Joi.string().optional().email(),
             password: Joi.string().required()
         })
-        .xor('userName', 'email')
+        .xor('userName', 'email'),
+
+    authenticate: Joi.object().keys({
+        'access-token': Joi.string().required(),
+        'refresh-token': Joi.string().required(),
+        userId: Joi.string().required()
+    })
 };

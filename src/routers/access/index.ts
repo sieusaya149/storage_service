@@ -23,12 +23,13 @@ accessRoute.post(
 // accessRoute.post('/forgot-password', asyncHandler(accessController.forgotPassword));
 // accessRoute.post('/reset-password', verifyResetPassword, asyncHandler(accessController.resetPassword));
 
-accessRoute.use(
-    validator(templateSchema.authenticate, ValidationSource.COOKIES),
-    authentication
-);
 // // logout
 // accessRoute.get('/ping', asyncHandler(accessController.ping));
-accessRoute.delete('/logout', asyncHandler(AccessController.logOut));
+accessRoute.delete(
+    '/logout',
+    validator(templateSchema.authenticate, ValidationSource.COOKIES),
+    authentication,
+    asyncHandler(AccessController.logOut)
+);
 
 export default accessRoute;

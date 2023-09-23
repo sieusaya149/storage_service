@@ -15,3 +15,6 @@ temp
 
 #test
 coverage/
+
+#public
+public/

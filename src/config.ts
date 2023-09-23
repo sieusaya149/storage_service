@@ -27,3 +27,5 @@ export const tokenInfo = {
 };
 
 export const logDirectory = process.env.LOG_DIR;
+
+export const publicDirectory = process.env.UPLOAD_DIR;

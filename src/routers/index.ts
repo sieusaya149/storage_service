@@ -7,5 +7,6 @@ import uploadRouter from './upload/index';
 //     res.status(200).json('hello world test');
 // });
 const API_ENDPOINT = '/v1/api/';
+routers.use(API_ENDPOINT, accessRouter);
 routers.use(API_ENDPOINT, uploadRouter);
 export default routers;

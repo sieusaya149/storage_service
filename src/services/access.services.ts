@@ -166,8 +166,6 @@ export class AccessService {
             Logger.error('Login Processing Failed', error);
             throw new InternalError('Issue Happen When Login User');
         }
-
-        return {};
     };
 
     static logOut = async (req: Request, res: Response) => {

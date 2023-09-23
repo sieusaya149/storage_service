@@ -16,7 +16,11 @@ export default (
 ) => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
-            const {error} = schema.validate(req[source]);
+            let options = {};
+            if (source == ValidationSource.HEADER) {
+                options = {allowUnknown: true};
+            }
+            const {error} = schema.validate(req[source], options);
 
             if (!error) return next();
 

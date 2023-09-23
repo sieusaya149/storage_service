@@ -20,5 +20,16 @@ export default {
         'access-token': Joi.string().required(),
         'refresh-token': Joi.string().required(),
         userId: Joi.string().required()
+    }),
+
+    requestUploadBusboy: Joi.object().keys({
+        fileName: Joi.string().required()
+    }),
+
+    uploadBusBoyHeader: Joi.object().keys({
+        fileid: Joi.string().required(),
+        'content-range': Joi.string()
+            .required()
+            .regex(/bytes=(\d+)-(\d+)\/(\d+)/)
     })
 };

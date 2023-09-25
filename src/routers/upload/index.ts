@@ -13,6 +13,8 @@ uploadRoute.post(
 );
 uploadRoute.post(
     '/busboy/upload',
+    validator(templateSchema.authenticate, ValidationSource.COOKIES),
+    authentication,
     validator(templateSchema.uploadBusBoyHeader, ValidationSource.HEADER),
     asyncHandler(UploadController.uploadBusBoy)
 );

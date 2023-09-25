@@ -52,20 +52,21 @@ export class UploadService {
         ) {
             throw new BadRequestError('Invalid Content Range');
         }
-        const busboy = Busboy({headers: req.headers});
-
-        req.pipe(busboy);
+        
         try {
-            const output = await this.busboyProcessing(
+            const busboy = Busboy({headers: req.headers});
+            req.pipe(busboy);
+            const resultParsing = await this.busboyProcessing(
                 busboy,
                 req,
                 rangeStart,
                 fileId
             );
-            return output;
+            return resultParsing;
         } catch (error) {
             req.destroy();
-            throw new BadRequestError('viethung');
+            Logger.error(error);
+            throw new BadRequestError();
         }
     };
 
@@ -77,40 +78,44 @@ export class UploadService {
     ) => {
         interface BusboyOutput {
             filePath: string;
+            formData: Map<any, any>;
         }
         return new Promise<BusboyOutput>((resolve, rejects) => {
             let filePath = '';
+            const formData = new Map();
+            busboy.on('field', (field: any, val: any) => {
+                formData.set(field, val);
+            });
             busboy.on('file', (_, file, fileName) => {
                 filePath = Utils.generateFilePath(fileId, fileName.filename);
                 console.log('Busboy --> Writing to file: ', filePath);
                 Utils.getFileDetails(filePath)
                     .then((stats) => {
                         if (stats.size !== rangeStart) {
-                            throw new Error('Provided Chunk is Invalid');
+                            throw new Error('Provided Chunk Invalid');
                         }
-
                         const writeStream = file.pipe(
                             fs.createWriteStream(filePath, {flags: 'a'})
                         );
-                        writeStream.on('error', (err) => {
-                            throw new Error('Issue Happen When writing data');
+                        writeStream.on('error', () => {
+                            throw new Error('Write Stream Failure');
                         });
                     })
                     .catch((err) => {
-                        Logger.error('Busboy On ', err);
+                        Logger.error(err);
                         rejects(err);
                     });
             });
 
             busboy.on('error', (err) => {
-                Logger.error('Error Event BusBoy', err);
                 rejects(err);
             });
 
             busboy.on('finish', () => {
                 Logger.info('Upload file by busboy finished');
                 resolve({
-                    filePath: filePath
+                    filePath: filePath,
+                    formData: formData
                 });
             });
         });

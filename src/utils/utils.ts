@@ -26,12 +26,12 @@ export default class Utils {
         try {
             if (fs.existsSync(filePath)) {
                 fs.unlink(filePath, () => {});
-                console.log('File deleted successfully:', filePath);
+                Logger.info(`File deleted successfully :: ${filePath}`);
             } else {
-                console.log('File does not exist', filePath);
+                Logger.warn(`File does not exist :: ${filePath}`);
             }
         } catch (error) {
-            console.log('Issue happen when delete file', filePath);
+            Logger.error(`Issue happen when delete file :: ${filePath}`);
         }
     };
 

@@ -13,21 +13,19 @@ import {
     AccessTokenError
 } from '../core/ApiError';
 import Logger from '../helpers/Logger';
-import {secretKeyCipher} from '../config';
+import {secretKeyCipher, exchangeCloud, queueCloud} from '../config';
 import Utils from '../utils/utils';
 import fs from 'fs';
 import Busboy from 'busboy';
 import BusboyService from '../helpers/busboyHandler';
-import {
-    executeUploadStream,
-    generateThumbnailStream
-} from '../helpers/streamHandler';
+import StreamHandler from '../helpers/streamHandler';
 import {File, FileMetaData} from '../database/model/Files';
 import FileRepo from '../database/repository/FileRepo';
 import CipherCrypto from '../helpers/cryptoAes';
 import {videoChecker, imageChecker} from '../utils/fileChecker';
 import Thumbnail from '~/database/model/Thumbnails';
-
+import RabbitMqServices from './rabbitmq.services';
+import {packFileInfo} from '../helpers/messageGen';
 export class UploadService {
     static requestUpload = async (req: Request, res: Response) => {
         // generate file first then return to client
@@ -68,10 +66,9 @@ export class UploadService {
 
             const {IV, cipher} = CipherCrypto.generateCipher(secretKeyCipher);
             const {file, formData, fileName} =
-                await BusboyService.execute(busboy);
-
+                await BusboyService.getBusboyData(busboy);
             const parent = formData.get('parent') || 'root';
-            const size = formData.get('size') || 1234;
+            const size = formData.get('size') || -1;
 
             const filePath = Utils.generateFilePath(fileId, fileName);
 
@@ -79,11 +76,10 @@ export class UploadService {
 
             const listStream = [file, cipher, fileWriteStream];
 
-            await executeUploadStream(
+            await StreamHandler.uploadGenFileStream(
                 file.pipe(cipher),
                 fileWriteStream,
                 req,
-                filePath,
                 listStream
             );
 
@@ -106,10 +102,11 @@ export class UploadService {
             const isImage = imageChecker(fileName);
             if (encryptedFileSize < 500 * 1024 * 1024 && isImage) {
                 //create thumbnail
-                const newThumbnail = (await generateThumbnailStream(
-                    fileName,
-                    metaData
-                )) as Thumbnail;
+                const newThumbnail =
+                    (await StreamHandler.thumbnailsGenFileStream(
+                        fileName,
+                        metaData
+                    )) as Thumbnail;
                 metaData = {
                     ...metaData,
                     hasThumbnail: true,
@@ -124,11 +121,20 @@ export class UploadService {
             };
             const newFileData = await FileRepo.create(fileObj);
             const fileDataFull = await FileRepo.getFileById(newFileData._id);
-            return {fileDataFull};
+            const msgCloudPush = packFileInfo(
+                userId,
+                fileDataFull,
+                secretKeyCipher
+            );
+            await RabbitMqServices.publishMessage(
+                msgCloudPush,
+                exchangeCloud,
+                queueCloud
+            );
+            return {fileData: fileDataFull};
         } catch (error) {
-            console.log(error);
             req.destroy();
-            Logger.error(error);
+            Logger.error(`Error happen in upload api :: ${error}`);
             throw new BadRequestError();
         }
     };

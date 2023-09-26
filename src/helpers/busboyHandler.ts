@@ -6,13 +6,16 @@ export interface BusboyOutput {
     formData: Map<any, any>;
 }
 export default class BusboyHander {
-    static execute = (busboy: Busboy.Busboy) => {
+    static getBusboyData = (busboy: Busboy.Busboy) => {
         return new Promise<BusboyOutput>((resolve, rejects) => {
             const formData = new Map();
+            // NOTE the form field should be placed order for trigger event
             busboy.on('field', (field: any, val: any) => {
+                console.log(`Upload Form ${field} : ${val}`);
                 formData.set(field, val);
             });
-            busboy.on('file', (_, file, fileName) => {
+
+            busboy.on('file', async (_, file, fileName) => {
                 resolve({
                     file: file, // stream data
                     fileName: fileName.filename,

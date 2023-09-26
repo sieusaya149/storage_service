@@ -9,9 +9,18 @@ export default class Utils {
         return crypto.randomBytes(length).toString('hex');
     };
 
-    static generateFilePath = (fileId: string, fileName: string) => {
-        return `${publicDirectory}/${fileId}-${fileName}`;
+    static generateFilePath = (
+        fileId: string,
+        fileName: string,
+        prefix = ''
+    ) => {
+        return `${publicDirectory}/${fileId}-${prefix + fileName}`;
     };
+
+    static getFileNameFromFilePath(filePath: string) {
+        const splits = filePath.split('/');
+        return splits[splits.length - 1];
+    }
 
     static removeFile = async (filePath: string) => {
         try {

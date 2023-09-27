@@ -5,7 +5,7 @@ import {ClientSession} from 'mongoose';
 import Logger from '~/helpers/Logger';
 class KeyStoreRepo {
     static existingKeyForUser = async (
-        user: User
+        user: Types.ObjectId
     ): Promise<KeyStore | null> => {
         return KeystoreModel.findOne({userId: user}).lean().exec();
     };
@@ -16,7 +16,7 @@ class KeyStoreRepo {
         return KeystoreModel.findOne({userId: userId}).lean().exec();
     };
 
-    static deleteKeyForUser = async (user: User) => {
+    static deleteKeyForUser = async (user: Types.ObjectId) => {
         return KeystoreModel.deleteOne({userId: user}).lean().exec();
     };
 

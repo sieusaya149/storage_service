@@ -70,7 +70,7 @@ export class AccessService {
                 privateKey
             );
             const newKeyStore = {
-                userId: newUser,
+                userId: newUser._id,
                 publicKey: publicKey,
                 privateKey: privateKey,
                 accessToken: accessToken,
@@ -136,7 +136,7 @@ export class AccessService {
                 privateKey
             );
             const newKeyStore = {
-                userId: existingUser,
+                userId: existingUser._id,
                 publicKey: publicKey,
                 privateKey: privateKey,
                 accessToken: accessToken,

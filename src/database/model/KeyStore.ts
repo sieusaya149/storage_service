@@ -5,8 +5,8 @@ export const DOCUMENT_NAME = 'Keystore';
 export const COLLECTION_NAME = 'keystores';
 
 export default interface KeyStore {
-    _id: Types.ObjectId;
-    userId: User;
+    _id?: Types.ObjectId;
+    userId: Types.ObjectId;
     publicKey: string;
     privateKey: string;
     accessToken: string;
@@ -18,7 +18,7 @@ export default interface KeyStore {
 
 export class KeyStoreData implements KeyStore {
     _id!: Types.ObjectId;
-    userId!: User;
+    userId!: Types.ObjectId;
     publicKey!: string;
     privateKey!: string;
     accessToken!: string;

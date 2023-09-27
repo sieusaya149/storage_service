@@ -1,6 +1,6 @@
 import {Response} from 'express';
 
-const maxAgeAccess = 60 * 1000 * 20; // 20 mins
+const maxAgeAccess = 60 * 1000 * 60; // 60 mins
 const maxAgeRefresh = 60 * 1000 * 60 * 24 * 30; // 30 days
 
 const secureCookies = true;

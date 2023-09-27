@@ -3,7 +3,7 @@ import {asyncHandler} from '../../helpers/asyncHandler';
 import AccessController from '../../controllers/access.controller';
 import templateSchema from '../inputSchema';
 import validator, {ValidationSource} from '../../middlewares/validator';
-import {authentication} from '../../auth/authenticate';
+import {authentication} from '../../middlewares/authenticate';
 const accessRoute = express.Router();
 accessRoute.post(
     '/signup',

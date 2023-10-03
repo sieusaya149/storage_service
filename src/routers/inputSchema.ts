@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import {CloudProvider} from '~/helpers/cloudConfigFactory';
 
 export default {
     signup: Joi.object().keys({
@@ -31,5 +32,55 @@ export default {
         'content-range': Joi.string()
             .required()
             .regex(/bytes=(\d+)-(\d+)\/(\d+)/)
+    }),
+
+    addCloudConfig: Joi.object().keys({
+        type: Joi.string()
+            .valid(
+                CloudProvider.AWS,
+                CloudProvider.GOOGLE,
+                CloudProvider.AZURE,
+                CloudProvider.IBM
+            )
+            .required(),
+        metaData: Joi.alternatives().conditional('type', {
+            is: CloudProvider.AWS,
+            then: Joi.object({
+                accessKey: Joi.string().required(),
+                secretKey: Joi.string().required(),
+                bucketName: Joi.string().required()
+            }),
+            otherwise: Joi.alternatives().conditional('type', {
+                is: CloudProvider.AZURE,
+                then: Joi.object({
+                    azureKey: Joi.string().required(),
+                    azureSecret: Joi.string().required(),
+                    containerName: Joi.string().required()
+                }),
+                otherwise: Joi.alternatives().conditional('type', {
+                    is: CloudProvider.GOOGLE,
+                    then: Joi.object({
+                        googleKey: Joi.string().required(),
+                        googleSecret: Joi.string().required(),
+                        bucketName: Joi.string().required()
+                    }),
+                    otherwise: Joi.alternatives().conditional('type', {
+                        is: CloudProvider.IBM,
+                        then: Joi.object({
+                            endpoint: Joi.string().required(),
+                            apiKeyId: Joi.string().required(),
+                            serviceInstanceId: Joi.string().required(),
+                            bucketName: Joi.string().required()
+                        }),
+                        otherwise: Joi.any() // Allow any data when 'type' is not recognized
+                    })
+                })
+            })
+        })
+        // metaData: Joi.any()
+    }),
+
+    deleteCloudConfig: Joi.object().keys({
+        configId: Joi.string().length(24).required()
     })
 };

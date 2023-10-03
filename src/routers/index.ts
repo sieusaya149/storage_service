@@ -2,6 +2,7 @@ import express from 'express';
 const routers = express.Router();
 import accessRouter from './access/index';
 import uploadRouter from './upload/index';
+import cloudInforRoute from './cloudConfig/index';
 
 // router.use('/', (req, res, next) => {
 //     res.status(200).json('hello world test');
@@ -9,4 +10,5 @@ import uploadRouter from './upload/index';
 const API_ENDPOINT = '/v1/api/';
 routers.use(API_ENDPOINT, accessRouter);
 routers.use(API_ENDPOINT, uploadRouter);
+routers.use(API_ENDPOINT, cloudInforRoute);
 export default routers;

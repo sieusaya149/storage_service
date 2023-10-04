@@ -1,4 +1,5 @@
 import {model, Types, Schema} from 'mongoose';
+import {PublishFileData} from 'packunpackservice';
 
 export const DOCUMENT_NAME = 'File';
 export const COLLECTION_NAME = 'files';
@@ -25,6 +26,34 @@ export interface File {
     openedAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
+}
+
+export class FileData implements File {
+    _id!: Types.ObjectId;
+    fileName!: string;
+    length!: number;
+    metadata!: FileMetaData;
+    openedAt?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+    constructor(file: File) {
+        this.fileName = file.fileName;
+        this.length = file.length;
+        this.createdAt = file.createdAt;
+        this.updatedAt = file.updatedAt;
+        this.metadata = file.metadata;
+    }
+
+    // Add a method to sanitize the user object (remove password) before returning it to the client
+    public getInforToPublish(): PublishFileData {
+        const publishFileData: PublishFileData = {
+            owner: this.metadata.owner,
+            fileName: this.fileName,
+            filePath: this.metadata.filePath,
+            size: this.metadata.size
+        };
+        return publishFileData;
+    }
 }
 
 const schemaFile = new Schema<File>({

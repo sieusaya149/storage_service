@@ -14,8 +14,8 @@ import {
 } from '../core/ApiError';
 import Logger from '../helpers/Logger';
 import {CloudConfigFactory} from '../helpers/cloudConfigFactory';
-import {CloudConfig} from '../database/model/CloudConfig';
 import CloudConfigRepo from '../database/repository/CloudConfigRepo';
+import {CloudConfig} from 'packunpackservice';
 export class CloudConfigService {
     static addCloudProvider = async (req: Request, res: Response) => {
         const {type} = req.body;
@@ -35,9 +35,17 @@ export class CloudConfigService {
         await CloudConfigRepo.create(newCloudConfig);
     };
 
-    static deleteCloudConfig = async (req: Request, res: Response) => {
-        const {configId} = req.params;
-        await CloudConfigRepo.delete(configId);
+    static deleteCloudConfig = async (
+        req: Request,
+        res: Response,
+        deleleAll = false
+    ) => {
+        if (deleleAll) {
+            await CloudConfigRepo.deleteAll();
+        } else {
+            const {configId} = req.params;
+            await CloudConfigRepo.delete(configId);
+        }
     };
 
     static getMyConfig = async (req: Request, res: Response) => {

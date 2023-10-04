@@ -1,18 +1,7 @@
 import {randomUUID} from 'crypto';
 import {Request} from 'express';
 import Logger from './Logger';
-
-export enum CloudProvider {
-    AWS = 'AWS',
-    GOOGLE = 'GOOGLE',
-    AZURE = 'AZURE',
-    IBM = 'IBM'
-}
-interface AwsCloudConfig {
-    accessKey: string;
-    secretKey: string;
-    BucketName: string;
-}
+import {CloudProvider} from 'packunpackservice';
 
 export class CloudConfigFactory {
     private type: string;

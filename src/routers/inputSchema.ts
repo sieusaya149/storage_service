@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import {CloudProvider} from '~/helpers/cloudConfigFactory';
+import {CloudProvider} from 'packunpackservice';
 
 export default {
     signup: Joi.object().keys({

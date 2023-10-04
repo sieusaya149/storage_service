@@ -1,19 +1,8 @@
 import {Request, Response} from 'express';
 import {Types} from 'mongoose';
-import {
-    AuthFailureError,
-    InternalError,
-    BadRequestError,
-    NotFoundError,
-    ForbiddenError,
-    NoEntryError,
-    BadTokenError,
-    TokenExpiredError,
-    NoDataError,
-    AccessTokenError
-} from '../core/ApiError';
+import {BadRequestError} from '../core/ApiError';
 import Logger from '../helpers/Logger';
-import {secretKeyCipher, exchangeCloud, queueCloud} from '../config';
+import {secretKeyCipher} from '../config';
 import Utils from '../utils/utils';
 import fs from 'fs';
 import Busboy from 'busboy';
@@ -24,8 +13,6 @@ import FileRepo from '../database/repository/FileRepo';
 import CipherCrypto from '../helpers/cryptoAes';
 import {videoChecker, imageChecker} from '../utils/fileChecker';
 import Thumbnail from '~/database/model/Thumbnails';
-import RabbitMqServices from './rabbitmq.services';
-import {packFileInfo} from '../helpers/messageGen';
 export class UploadService {
     static requestUpload = async (req: Request, res: Response) => {
         // generate file first then return to client
@@ -120,21 +107,14 @@ export class UploadService {
                 metadata: metaData
             };
             const newFileData = await FileRepo.create(fileObj);
-            const fileDataFull = await FileRepo.getFileById(newFileData._id);
-            const msgCloudPush = packFileInfo(
-                userId,
-                fileDataFull,
-                secretKeyCipher
-            );
-            await RabbitMqServices.publishMessage(
-                msgCloudPush,
-                exchangeCloud,
-                queueCloud
-            );
-            return {fileData: fileDataFull};
+            const fileData = await FileRepo.getFileById(newFileData._id);
+            if (!fileData) {
+                throw new Error('No information about the file added');
+            }
+            return {fileData: fileData};
         } catch (error) {
-            req.destroy();
             Logger.error(`Error happen in upload api :: ${error}`);
+            req.destroy();
             throw new BadRequestError();
         }
     };

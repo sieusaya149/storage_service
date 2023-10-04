@@ -26,6 +26,18 @@ class CloudConfigController {
         return successRes.send(res);
     };
 
+    static deleteAllConfig = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Delete Cloud Provider success!',
+            await CloudConfigService.deleteCloudConfig(req, res, true)
+        );
+        return successRes.send(res);
+    };
+
     static getMyConfig = async (
         req: Request,
         res: Response,

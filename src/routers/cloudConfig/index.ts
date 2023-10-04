@@ -26,4 +26,9 @@ cloudInforRoute.delete(
     asyncHandler(CloudConfigController.deleteCloudConfig)
 );
 
+cloudInforRoute.delete(
+    '/deleteAll',
+    asyncHandler(CloudConfigController.deleteAllConfig)
+);
+
 export default cloudInforRoute;

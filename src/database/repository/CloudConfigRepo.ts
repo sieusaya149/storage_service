@@ -1,6 +1,7 @@
 import {BadRequestError} from '~/core/ApiError';
-import {CloudConfigModel, CloudConfig} from '../model/CloudConfig';
+import {CloudConfigModel} from '../model/CloudConfig';
 import {Types} from 'mongoose';
+import {CloudConfig} from 'packunpackservice';
 
 export default class CloudConfigRepo {
     static create = async (newConfig: CloudConfig) => {
@@ -26,6 +27,10 @@ export default class CloudConfigRepo {
         } else {
             throw new BadRequestError('No Config to be delete');
         }
+    };
+
+    static deleteAll = async () => {
+        await CloudConfigModel.deleteMany({});
     };
 
     static getConfigByUserId = async (userId: string) => {

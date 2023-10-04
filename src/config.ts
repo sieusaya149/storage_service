@@ -1,3 +1,4 @@
+import path from 'path';
 // Mapper for environment variables
 export const environment = process.env.NODE_ENV;
 export const port = process.env.PORT;
@@ -28,7 +29,9 @@ export const tokenInfo = {
 
 export const logDirectory = process.env.LOG_DIR;
 
-export const publicDirectory = process.env.UPLOAD_DIR;
+const publicDirectoryName = process.env.UPLOAD_DIR_NAME || 'public';
+// console.log(publicDirectory)
+export const publicDirectory = path.join(__dirname, '..', publicDirectoryName);
 
 export const secretKeyCipher = process.env.SECRET_CIPHER || 'default_secret';
 

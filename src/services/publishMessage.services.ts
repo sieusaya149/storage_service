@@ -15,6 +15,10 @@ export class PublishMessageService {
             const listConfig = await CloudConfigRepo.getConfigByUserId(
                 fileData.owner.toString()
             );
+            if (listConfig.length == 0) {
+                Logger.warn('Store on disk only');
+                return;
+            }
             const cloudUploadMsg: CloudUploadMsg = {
                 typeMsg: PackUnPackType.CLOUD_UPLOAD,
                 cloudConfigs: listConfig,

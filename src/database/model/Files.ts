@@ -47,6 +47,7 @@ export class FileData implements File {
     // Add a method to sanitize the user object (remove password) before returning it to the client
     public getInforToPublish(): PublishFileData {
         const publishFileData: PublishFileData = {
+            fileId: this._id,
             owner: this.metadata.owner,
             fileName: this.fileName,
             filePath: this.metadata.filePath,

@@ -13,6 +13,8 @@ import FileRepo from '../database/repository/FileRepo';
 import CipherCrypto from '../helpers/cryptoAes';
 import {videoChecker, imageChecker} from '../utils/fileChecker';
 import Thumbnail from '~/database/model/Thumbnails';
+import {DownloaderFactory} from '~/helpers/Dowloader';
+
 export class UploadService {
     static requestUpload = async (req: Request, res: Response) => {
         // generate file first then return to client
@@ -116,6 +118,31 @@ export class UploadService {
             Logger.error(`Error happen in upload api :: ${error}`);
             req.destroy();
             throw new BadRequestError();
+        }
+    };
+
+    static downloadFile = async (req: Request, res: Response) => {
+        const {fileId} = req.params;
+        const src = req.query.src as string;
+
+        const fileData = await FileRepo.getFileById(new Types.ObjectId(fileId));
+        // for dowloading file, we should write data to response stream
+        // ReadFile => Decipher => Response
+        // FIXME should be check more condition for downloading file
+        if (!fileData) {
+            throw new BadRequestError('The file does not exist');
+        }
+        try {
+            const downloader = new DownloaderFactory(
+                src || 'disk'
+            ).createDowloader();
+            if (!downloader) {
+                throw new BadRequestError('Can not create downloader');
+            }
+            await downloader.download(res, fileData);
+        } catch (error) {
+            Logger.error(`Download File Error File Route: ${error}`);
+            throw new BadRequestError('\nDownload File Error File Route');
         }
     };
 }

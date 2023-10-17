@@ -82,5 +82,16 @@ export default {
 
     deleteCloudConfig: Joi.object().keys({
         configId: Joi.string().length(24).required()
+    }),
+
+    downloadFileQuery: Joi.object().keys({
+        src: Joi.string().valid('aws', 'disk').required()
+    }),
+
+    downloadFileParam: Joi.object().keys({
+        fileId: Joi.string()
+            .length(24)
+            .regex(/^[0-9A-Fa-f]+$/)
+            .required()
     })
 };

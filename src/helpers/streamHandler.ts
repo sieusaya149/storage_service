@@ -99,4 +99,28 @@ export default class StreamHandler {
             }
         });
     };
+
+    static downloadFileStream = <T>(
+        inputSteam: any,
+        outputStream: any,
+        allStreamsToCatchError: any[]
+    ) => {
+        return new Promise<T>((resolve, reject) => {
+            allStreamsToCatchError.forEach((currentStream: any) => {
+                currentStream.on('error', (e: Error) => {
+                    // TODO should remove file if upload failure
+
+                    reject({
+                        message: 'Await Stream Input Error',
+                        code: 500,
+                        error: e
+                    });
+                });
+            });
+
+            inputSteam.pipe(outputStream).on('finish', (data: T) => {
+                resolve(data);
+            });
+        });
+    };
 }

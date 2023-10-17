@@ -1,7 +1,7 @@
 import express from 'express';
 const routers = express.Router();
 import accessRouter from './access/index';
-import uploadRouter from './upload/index';
+import fileRoute from './file/index';
 import cloudInforRoute from './cloudConfig/index';
 
 // router.use('/', (req, res, next) => {
@@ -9,6 +9,6 @@ import cloudInforRoute from './cloudConfig/index';
 // });
 const API_ENDPOINT = '/v1/api/';
 routers.use(API_ENDPOINT, accessRouter);
-routers.use(API_ENDPOINT, uploadRouter);
+routers.use(API_ENDPOINT, fileRoute);
 routers.use(API_ENDPOINT, cloudInforRoute);
 export default routers;

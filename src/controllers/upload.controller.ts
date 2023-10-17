@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction} from 'express';
 import {SuccessResponse} from '../core/ApiResponse';
-import {UploadService} from '../services/upload.services';
-import {PublishMessageService} from '~/services/publishMessage.services';
+import {UploadService} from '../services/file.services';
+import {PublishMessageService} from '../services/publishMessage.services';
 class UploadController {
     static requestUpload = async (
         req: Request,
@@ -24,6 +24,14 @@ class UploadController {
         await PublishMessageService.pushUploadTask(fileData);
         const successRes = new SuccessResponse('Upload Success!', fileData);
         return successRes.send(res);
+    };
+
+    static downloadFile = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
+        await UploadService.downloadFile(req, res);
     };
 }
 

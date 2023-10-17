@@ -4,20 +4,29 @@ import UploadController from '../../controllers/upload.controller';
 import validator, {ValidationSource} from '../../middlewares/validator';
 import {authentication} from '../../middlewares/authenticate';
 import templateSchema from '../inputSchema';
-const uploadRoute = express.Router();
+const fileRoute = express.Router();
 // uploadRoute.use();
-uploadRoute.post(
-    '/busboy/request-upload',
+fileRoute.post(
+    '/file/upload/request-upload',
     authentication,
     validator(templateSchema.requestUploadBusboy),
     asyncHandler(UploadController.requestUpload)
 );
-uploadRoute.post(
-    '/busboy/upload',
+
+fileRoute.post(
+    '/file/upload',
     validator(templateSchema.authenticate, ValidationSource.COOKIES),
     authentication,
     validator(templateSchema.uploadBusBoyHeader, ValidationSource.HEADER),
     asyncHandler(UploadController.uploadBusBoy)
 );
 
-export default uploadRoute;
+fileRoute.get(
+    '/file/download/:fileId',
+    authentication,
+    validator(templateSchema.downloadFileParam, ValidationSource.PARAM),
+    validator(templateSchema.downloadFileQuery, ValidationSource.QUERY),
+    asyncHandler(UploadController.downloadFile)
+);
+
+export default fileRoute;

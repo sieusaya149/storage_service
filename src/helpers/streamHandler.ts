@@ -1,4 +1,4 @@
-import {Request} from 'express';
+import {Request, Response} from 'express';
 import {FileMetaData} from '../database/model/Files';
 import Utils from '../utils/utils';
 // import removeChunksFS from "./removeChunksFS";
@@ -120,6 +120,52 @@ export default class StreamHandler {
 
             inputSteam.pipe(outputStream).on('finish', (data: T) => {
                 resolve(data);
+            });
+        });
+    };
+
+    static streamVideoStream = <T>(
+        readStream: any,
+        decipher: any,
+        req: Request,
+        res: Response,
+        allStreamsToCatchError: any[]
+    ) => {
+        return new Promise<T>((resolve, reject) => {
+            req.on('close', () => {
+                // readStream.destroy();
+                Logger.info('Stream Request has been closed');
+                decipher.destroy();
+                resolve({} as T);
+            });
+
+            req.on('end', () => {
+                Logger.info('Stream Request has been End');
+                allStreamsToCatchError.forEach((stream) => {
+                    stream.destroy();
+                });
+                resolve({} as T);
+            });
+
+            readStream.on('close', () => {
+                Logger.info(
+                    'Read Stream has been closed, the decipher will closed also'
+                );
+                decipher.destroy();
+            });
+
+            allStreamsToCatchError.forEach((currentStream: any) => {
+                currentStream.on('error', (e: Error) => {
+                    reject({
+                        message: 'Await Stream Input Error',
+                        code: 500,
+                        error: e
+                    });
+                });
+            });
+
+            decipher.pipe(res).on('finish', (data: T) => {
+                console.log('Stream data done');
             });
         });
     };

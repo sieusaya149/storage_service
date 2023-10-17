@@ -29,4 +29,9 @@ fileRoute.get(
     asyncHandler(UploadController.downloadFile)
 );
 
+fileRoute.get(
+    '/file/stream-video/:fileId',
+    asyncHandler(UploadController.streamVideo)
+);
+
 export default fileRoute;

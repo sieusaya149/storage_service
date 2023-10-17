@@ -14,8 +14,9 @@ import CipherCrypto from '../helpers/cryptoAes';
 import {videoChecker, imageChecker} from '../utils/fileChecker';
 import Thumbnail from '~/database/model/Thumbnails';
 import {DownloaderFactory} from '~/helpers/Dowloader';
-
-export class UploadService {
+import getNewIv from '~/helpers/getNewIV';
+const CHUNK_SIZE = 5 * 1024 * 1024 ;
+export class FileService {
     static requestUpload = async (req: Request, res: Response) => {
         // generate file first then return to client
         const {fileName} = req.body;
@@ -143,6 +144,74 @@ export class UploadService {
         } catch (error) {
             Logger.error(`Download File Error File Route: ${error}`);
             throw new BadRequestError('\nDownload File Error File Route');
+        }
+    };
+
+    static streamVideo = async (req: Request, res: Response) => {
+        const {fileId} = req.params;
+        const fileData = await FileRepo.getFileById(new Types.ObjectId(fileId));
+        if (!fileData) {
+            throw new BadRequestError('The file does not exist');
+        }
+        if (!fileData.metadata.isVideo) {
+            throw new BadRequestError('The file is not a video');
+        }
+        try {
+            Logger.info('Starting stream video');
+            const fileSize = fileData.metadata.size;
+            const range = req.headers.range;
+            // remove /bytes=/ in range header then split to part array by '-'
+            const parts = range?.replace(/bytes=/, '').split('-');
+            const start = parseInt(parts![0], 10);
+            const end = parts![1] ? parseInt(parts![1], 10) : fileSize - 1;
+            const chunksize = end - start + 1;
+            const head = {
+                'Content-Range': 'bytes ' + start + '-' + end + '/' + fileSize,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunksize,
+                'Content-Type': 'video/mp4'
+            };
+            const fixedEnd = fileData.length;
+            const readFileStream = fs.createReadStream(
+                fileData.metadata.filePath,
+                {
+                    start: start,
+                    end: fixedEnd
+                }
+            );
+            let currentIV = null;
+            if (start !== 0) {
+                Logger.info(`The start is ${start} get new IV`);
+                // If this isn't the first request, the way AES256 works is when you try to
+                // Decrypt a certain part of the file that isn't the start, the IV will
+                // Actually be the 16 bytes ahead of where you are trying to
+                // Start the decryption.
+                currentIV = (await getNewIv(
+                    start - 16,
+                    fileData.metadata.filePath!
+                )) as Buffer;
+                Logger.info(`new IV ${currentIV}`);
+            }
+            const decipherStream = CipherCrypto.generateDecipher(
+                secretKeyCipher,
+                currentIV || fileData.metadata.IV
+            );
+            decipherStream.setAutoPadding(false);
+
+            res.writeHead(206, head);
+            const allStreamsToErrorCatch = [readFileStream, decipherStream];
+            readFileStream.pipe(decipherStream);
+            await StreamHandler.streamVideoStream(
+                readFileStream,
+                decipherStream,
+                req,
+                res,
+                allStreamsToErrorCatch
+            );
+            readFileStream.destroy();
+        } catch (error) {
+            Logger.error(`Stream File Error File Route: ${error}`);
+            throw new BadRequestError('\nStream Video File Error');
         }
     };
 }

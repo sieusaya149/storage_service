@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from 'express';
 import {SuccessResponse} from '../core/ApiResponse';
-import {UploadService} from '../services/file.services';
+import {FileService} from '../services/file.services';
 import {PublishMessageService} from '../services/publishMessage.services';
 class UploadController {
     static requestUpload = async (
@@ -10,7 +10,7 @@ class UploadController {
     ): Promise<Response> => {
         const successRes = new SuccessResponse(
             'Request Upload Success!',
-            await UploadService.requestUpload(req, res)
+            await FileService.requestUpload(req, res)
         );
         return successRes.send(res);
     };
@@ -20,7 +20,7 @@ class UploadController {
         res: Response,
         next: NextFunction
     ): Promise<Response | undefined> => {
-        const {fileData} = await UploadService.uploadBusBoy(req, res);
+        const {fileData} = await FileService.uploadBusBoy(req, res);
         await PublishMessageService.pushUploadTask(fileData);
         const successRes = new SuccessResponse('Upload Success!', fileData);
         return successRes.send(res);
@@ -31,7 +31,15 @@ class UploadController {
         res: Response,
         next: NextFunction
     ) => {
-        await UploadService.downloadFile(req, res);
+        await FileService.downloadFile(req, res);
+    };
+
+    static streamVideo = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
+        await FileService.streamVideo(req, res);
     };
 }
 

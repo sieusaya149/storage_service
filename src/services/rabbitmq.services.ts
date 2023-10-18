@@ -41,4 +41,27 @@ export default class RabbitMqServices {
             await connection.close();
         }
     };
+
+    static consumer = async (exchangeName: string, queueName: string) => {
+        if (!rabbitMqUri) {
+            throw new Error('Invalid rabbitmq url');
+        }
+        const connection = await amqp.connect(rabbitMqUri);
+        const channel = await connection.createChannel();
+        const queue = await channel.assertQueue(queueName);
+        console.log(
+            `bind the queue ${queue.queue} to exchange ${exchangeName} with queueName ${queueName}`
+        );
+        channel.bindQueue(queue.queue, exchangeName, queueName);
+
+        channel.consume(queue.queue, (message) => {
+            if (message !== null) {
+                const data = JSON.parse(message.content.toString());
+                console.log('=====> Received New Data <======');
+                console.log(data);
+                // Acknowledge the message when processing is complete.
+                channel.ack(message);
+            }
+        });
+    };
 }

@@ -15,7 +15,6 @@ import {videoChecker, imageChecker} from '../utils/fileChecker';
 import Thumbnail from '~/database/model/Thumbnails';
 import {DownloaderFactory} from '~/helpers/Dowloader';
 import getNewIv from '~/helpers/getNewIV';
-const CHUNK_SIZE = 5 * 1024 * 1024 ;
 export class FileService {
     static requestUpload = async (req: Request, res: Response) => {
         // generate file first then return to client

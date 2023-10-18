@@ -39,3 +39,7 @@ export const rabbitMqUri = process.env.RABBITMQ_URI || undefined;
 export const exchangeCloud =
     process.env.EXCHANGE_CLOUD_PUSH || 'cloud_exchange';
 export const queueCloud = process.env.QUEUE_CLOUD || 'cloud_queue';
+
+// exchange and queue for handling notify (fanout exchange)
+export const exchangeNotify = process.env.EXCHANGE_NOTIFY || 'notify_exchange';
+export const queueStatusJob = process.env.QUEUE_NOTIFY || 'job_status_queue';

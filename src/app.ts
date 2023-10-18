@@ -1,7 +1,7 @@
 import express, {Request, Response, NextFunction} from 'express';
 import Logger from './helpers/Logger';
 import cors from 'cors';
-import {corsUrl, environment} from './config';
+import {corsUrl, environment, exchangeNotify, queueStatusJob} from './config';
 import routers from './routers';
 import {
     NotFoundError,
@@ -11,11 +11,12 @@ import {
 } from './core/ApiError';
 import cookieParser from 'cookie-parser';
 import './database'; // initialize database
+import RabbitMqServices from './services/rabbitmq.services';
 
 process.on('uncaughtException', (e: Error) => {
     Logger.error(e);
 });
-
+RabbitMqServices.consumer(exchangeNotify, queueStatusJob);
 const app = express();
 
 // midderware added

@@ -1,5 +1,6 @@
 import {model, Types, Schema} from 'mongoose';
 import {PublishFileData} from 'packunpackservice';
+import {BadRequestError} from '~/core/ApiError';
 
 export const DOCUMENT_NAME = 'File';
 export const COLLECTION_NAME = 'files';
@@ -37,6 +38,10 @@ export class FileData implements File {
     createdAt?: Date;
     updatedAt?: Date;
     constructor(file: File) {
+        if (!file._id) {
+            throw new BadRequestError('The file missing Id');
+        }
+        this._id = file._id;
         this.fileName = file.fileName;
         this.length = file.length;
         this.createdAt = file.createdAt;

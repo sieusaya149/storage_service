@@ -1,7 +1,7 @@
 import {BadRequestError} from '~/core/ApiError';
 import {CloudConfigModel} from '../model/CloudConfig';
 import {Types} from 'mongoose';
-import {CloudConfig} from 'packunpackservice';
+import {CloudConfig, CloudConfigStatus} from 'packunpackservice';
 
 export default class CloudConfigRepo {
     static create = async (newConfig: CloudConfig) => {
@@ -33,8 +33,14 @@ export default class CloudConfigRepo {
         await CloudConfigModel.deleteMany({});
     };
 
+    // TODO SHOUlD api get config, it should be provide query rather hardcode for finding
+    // status = ENABLE like this
     static getConfigByUserId = async (userId: string) => {
-        const listUser = await CloudConfigModel.find({owner: userId});
+        const conditions = [
+            {owner: userId},
+            {status: CloudConfigStatus.ENABLE}
+        ];
+        const listUser = await CloudConfigModel.find({$and: conditions});
         return listUser;
     };
 }

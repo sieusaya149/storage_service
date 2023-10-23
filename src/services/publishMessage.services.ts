@@ -6,12 +6,14 @@ import RabbitMqServices from './rabbitmq.services';
 import {exchangeCloud, queueCloud} from '../config';
 import Logger from '../helpers/Logger';
 import {PackUnPackType} from 'packunpackservice';
+import CloudFileRepo from '~/database/repository/CloudFileRepo';
 
 export class PublishMessageService {
     static pushUploadTask = async (file: File) => {
         try {
             const packingObj = new PackingMessage<CloudUploadMsg>();
             const fileData = new FileData(file).getInforToPublish();
+            // only get the config that was enabled
             const listConfig = await CloudConfigRepo.getConfigByUserId(
                 fileData.owner.toString()
             );
@@ -25,6 +27,10 @@ export class PublishMessageService {
                 fileData: new FileData(file).getInforToPublish(),
                 createdAt: new Date()
             };
+            console.log(listConfig);
+            for (let i = 0; i < listConfig.length; i++) {
+                CloudFileRepo.createByCloudConfig(listConfig[i], file);
+            }
             const packedData = packingObj.packData(cloudUploadMsg);
             await RabbitMqServices.publishMessage(
                 packedData,

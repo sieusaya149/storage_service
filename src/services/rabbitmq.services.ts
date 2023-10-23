@@ -1,6 +1,7 @@
 import {rabbitMqUri} from '../config';
 import Logger from '../helpers/Logger';
 import amqp from 'amqplib';
+import CloudFileRepo from '~/database/repository/CloudFileRepo';
 
 export default class RabbitMqServices {
     static publishMessage = async function (
@@ -54,12 +55,14 @@ export default class RabbitMqServices {
         );
         channel.bindQueue(queue.queue, exchangeName, queueName);
 
-        channel.consume(queue.queue, (message) => {
+        channel.consume(queue.queue, async (message) => {
             if (message !== null) {
-                const data = JSON.parse(message.content.toString());
-                console.log('=====> Received New Data <======');
-                console.log(data);
-                // Acknowledge the message when processing is complete.
+                const notifyContent = JSON.parse(message.content.toString());
+                if (!notifyContent.type) {
+                    throw new Error('Missing type notify');
+                }
+                CloudFileRepo.createByNotify(notifyContent);
+                // Acknowledge the message when receiving message is complete.
                 channel.ack(message);
             }
         });

@@ -1,7 +1,7 @@
 import {model, Types, Schema} from 'mongoose';
 export const DOCUMENT_NAME = 'CloudConfig';
 export const COLLECTION_NAME = 'cloudconfigs';
-import {CloudConfig, CloudProvider} from 'packunpackservice';
+import {CloudConfig, CloudConfigStatus, CloudProvider} from 'packunpackservice';
 
 const schemaCloudConfig = new Schema<CloudConfig>({
     type: {
@@ -13,6 +13,11 @@ const schemaCloudConfig = new Schema<CloudConfig>({
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'User'
+    },
+    status: {
+        type: Schema.Types.String,
+        enum: CloudConfigStatus,
+        default: CloudConfigStatus.ENABLE
     },
     metaData: {
         type: Schema.Types.Mixed,

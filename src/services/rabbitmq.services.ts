@@ -61,7 +61,12 @@ export default class RabbitMqServices {
                 if (!notifyContent.type) {
                     throw new Error('Missing type notify');
                 }
-                CloudFileRepo.createByNotify(notifyContent);
+                if (notifyContent.task.type == 'UPLOAD') {
+                    CloudFileRepo.createByNotify(notifyContent);
+                }
+                if (notifyContent.task.type == 'DELETE') {
+                    CloudFileRepo.deleteByNotify(notifyContent);
+                }
                 // Acknowledge the message when receiving message is complete.
                 channel.ack(message);
             }

@@ -20,17 +20,30 @@ export default class CloudFileRepo {
         return newCloudFile;
     };
 
-    static getFileById = async (cloudFileId: Types.ObjectId) => {
+    static getCloudFileById = async (cloudFileId: Types.ObjectId) => {
         const cloudFileData = await CloudFileModel.findOne({
             _id: cloudFileId
-        }).exec();
+        })
+            .populate('cloudConfig')
+            .exec();
         return cloudFileData;
+    };
+
+    static getCloudFileByDiskId = async (fileId: Types.ObjectId) => {
+        const filter = {diskFileId: fileId};
+        const cloudFindData = await CloudFileModel.find(filter).exec();
+        return cloudFindData;
     };
 
     static createByNotify = async (notifyContent: any) => {
         const {type} = notifyContent;
-        const {cloudConfig, metadata, cloudUploadInfo} =
-            notifyContent.uploadTask;
+        if (notifyContent.task.type != 'UPLOAD') {
+            Logger.info(
+                `No Update Cloud File Record With Notify with task type is ${notifyContent.task.type}`
+            );
+            return;
+        }
+        const {cloudConfig, metadata, cloudUploadInfo} = notifyContent.task;
         if (type != NotifyType.successTask && type != NotifyType.failureTask) {
             Logger.info(
                 `No Update Cloud File Record With Notify type is ${type}`
@@ -49,7 +62,6 @@ export default class CloudFileRepo {
                 `The cloud file ${cloudConfig._id} was not existing for file ${metadata.fileId}`
             );
         }
-        console.log(notifyContent);
         console.log(
             `NOTIFY: JOB Uploading File ${metadata.fileId} to ${cloudConfig.type} ###${type}###`
         );
@@ -60,6 +72,33 @@ export default class CloudFileRepo {
             cloudInfo: cloudUploadInfo
         } as CloudFile;
         await CloudFileRepo.upsert(newCloudFile);
+    };
+
+    static deleteCloudFileByLocationCloud = async (location: string) => {
+        const filter = {
+            'cloudInfo.Location': location
+        };
+        const deleteResult = await CloudFileModel.deleteOne(filter).exec();
+        return deleteResult;
+    };
+
+    static deleteByNotify = async (notifyContent: any) => {
+        const {type} = notifyContent;
+        if (notifyContent.task.type != 'DELETE') {
+            Logger.info(
+                `No Delete Cloud File Record With Notify with task type is ${notifyContent.task.type}`
+            );
+            return;
+        }
+        const {fileInfor} = notifyContent.task;
+        if (type != NotifyType.successTask) {
+            Logger.info(
+                `No Delete Cloud File Record With Notify type is ${type}`
+            );
+            return;
+        }
+        await CloudFileRepo.deleteCloudFileByLocationCloud(fileInfor.Location);
+        console.log(`NOTIFY: JOB Delete File ###${type}###`);
     };
 
     static upsert = async (cloudFile: CloudFile): Promise<any> => {

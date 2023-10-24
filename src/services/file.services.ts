@@ -15,6 +15,7 @@ import {videoChecker, imageChecker} from '../utils/fileChecker';
 import Thumbnail from '~/database/model/Thumbnails';
 import {DownloaderFactory} from '~/helpers/Dowloader';
 import getNewIv from '~/helpers/getNewIV';
+import CloudFileRepo from '~/database/repository/CloudFileRepo';
 export class FileService {
     static requestUpload = async (req: Request, res: Response) => {
         // generate file first then return to client
@@ -212,5 +213,31 @@ export class FileService {
             Logger.error(`Stream File Error File Route: ${error}`);
             throw new BadRequestError('\nStream Video File Error');
         }
+    };
+
+    static getCloudFileByDiskId = async (req: Request, res: Response) => {
+        const {fileId} = req.params;
+        const fileData = await FileRepo.getFileById(new Types.ObjectId(fileId));
+        if (!fileData) {
+            throw new BadRequestError('The file does not exist');
+        }
+        const CloudFiles = await CloudFileRepo.getCloudFileByDiskId(
+            new Types.ObjectId(fileId)
+        );
+        return CloudFiles;
+    };
+
+    static getCloudFileById = async (req: Request, res: Response) => {
+        const {cloudFileId} = req.params;
+        if (!cloudFileId) {
+            throw new BadRequestError('Please give the cloud file id');
+        }
+        const cloudFileData = await CloudFileRepo.getCloudFileById(
+            new Types.ObjectId(cloudFileId)
+        );
+        if (!cloudFileData) {
+            throw new BadRequestError('The cloud file does not exist');
+        }
+        return cloudFileData;
     };
 }

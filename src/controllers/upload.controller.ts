@@ -41,6 +41,44 @@ class UploadController {
     ) => {
         await FileService.streamVideo(req, res);
     };
+
+    static getCloudFileByDiskId = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Cloud Files Success!',
+            await FileService.getCloudFileByDiskId(req, res)
+        );
+        return successRes.send(res);
+    };
+
+    static getCloudFileById = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Cloud File Success!',
+            await FileService.getCloudFileById(req, res)
+        );
+        return successRes.send(res);
+    };
+
+    static deleteCloudFile = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const cloudFileData = await FileService.getCloudFileById(req, res);
+        await PublishMessageService.pushDeleteTask(cloudFileData);
+        const successRes = new SuccessResponse(
+            'Trigger Delete Cloud File Success!',
+            {}
+        );
+        return successRes.send(res);
+    };
 }
 
 export default UploadController;

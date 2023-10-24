@@ -34,4 +34,20 @@ fileRoute.get(
     asyncHandler(UploadController.streamVideo)
 );
 
+fileRoute.get(
+    '/file/cloudFiles/:fileId',
+    asyncHandler(UploadController.getCloudFileByDiskId)
+);
+
+fileRoute.get(
+    '/file/cloudFile/:cloudFileId',
+    asyncHandler(UploadController.getCloudFileById)
+);
+
+// NOTE: this api just trigger delete not delete immediately
+fileRoute.delete(
+    '/file/cloudFile/:cloudFileId',
+    asyncHandler(UploadController.deleteCloudFile)
+);
+
 export default fileRoute;

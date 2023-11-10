@@ -79,6 +79,19 @@ class UploadController {
         );
         return successRes.send(res);
     };
+
+    static getFileInfor = async (
+        req: Request, 
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const fileInfo = await FileService.getFileInfor(req, res);
+        const successRes = new SuccessResponse(
+            'Success Getting Infor!',
+            fileInfo
+        );
+        return successRes.send(res);
+    }
 }
 
 export default UploadController;

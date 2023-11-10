@@ -50,4 +50,10 @@ fileRoute.delete(
     asyncHandler(UploadController.deleteCloudFile)
 );
 
+fileRoute.get(
+    '/file/:fileId',
+    authentication,
+    asyncHandler(UploadController.getFileInfor)
+);
+
 export default fileRoute;

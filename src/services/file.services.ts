@@ -240,4 +240,13 @@ export class FileService {
         }
         return cloudFileData;
     };
+
+    static getFileInfor = async (req: Request, res: Response) => {
+        const {fileId} = req.params;
+        const fileData = await FileRepo.getFileById(new Types.ObjectId(fileId));
+        if (!fileData) {
+            throw new BadRequestError('The file does not exist');
+        }
+        return fileData;
+    };
 }

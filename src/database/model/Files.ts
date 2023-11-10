@@ -4,6 +4,18 @@ import {BadRequestError} from '~/core/ApiError';
 
 export const DOCUMENT_NAME = 'File';
 export const COLLECTION_NAME = 'files';
+
+enum DeleteType {
+    NONE = 'NONE',
+    TEMPORARY = 'TEMPORARY',
+    PERMANENTLY = 'PERMANENTLY'
+}
+type DeleteInfor = {
+    type: DeleteType;
+    previosParent?: Types.ObjectId;
+    triggerTime?: Date;
+};
+
 export interface FileMetaData {
     owner: Types.ObjectId;
     parent: string;
@@ -16,6 +28,7 @@ export interface FileMetaData {
     filePath: string;
     isShared?: boolean;
     isDeleted?: boolean;
+    deleteInfo?: DeleteInfor;
     isClouded?: boolean;
     isOnDisk?: boolean;
 }
@@ -118,6 +131,12 @@ const schemaFile = new Schema<File>({
             isDeleted: {
                 type: Schema.Types.Boolean,
                 default: false
+            },
+            deleteInfo: {
+                type: Schema.Types.Mixed,
+                default: {
+                    type: DeleteType.NONE
+                }
             },
             isClouded: {
                 type: Schema.Types.Boolean,
